@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="script/song.js" defer></script>
+    <script src="script/playlist.js" defer></script>
+    <script src="script/player.js" defer></script>
+    <script src="script/control.js" defer></script>
+    <script src="script/setSize.js" defer></script>
+    <script src="script/visualizer.js" defer></script>
+    <script src="script/main.js" defer></script>
+    <title>Document</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            background: none;
+            border: none;
+            outline: none;
+        }
+        body, html {
+            height: 100vh;
+            overflow: hidden;
+        }
+        .mainContainer {
+            height: 100%;
+            display: inline-flex;
+            width: auto;
+            overflow: hidden;
+        }
+        .visualizerContainer {
+            width: 100vw;
+            height: 100%;
+            transition: width .5s linear;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .playerContainer {
+            height: 100%;
+            padding: 10px;
+            width: calc(0.3 * 100vw);
+            scroll-behavior: smooth;
+            overflow-y: scroll;
+            background-color: white;
+        }
+        .showPlayer {
+            width: calc(0.7 * 100vw);
+            transition: width .5s linear;
+        }
+        .songImgDiv {
+            position: absolute;
+            width: calc(0.25 * 100vw);
+            height: calc(0.25 * 100vw);
+            border-radius: 50%;
+            box-shadow: 0px 0px 25px rgb(26, 26, 26);
+            border: 3px solid rgb(51, 51, 51);
+            overflow: hidden;
+            z-index: 10;
+        }
+        .songImg {
+            width: 100%;
+            height: 100%;
+        }
+        .songImgDiv:hover {
+            cursor: pointer;
+        }
+        .playerSongImgDiv, .songInfo, .controlContainer, .durationContainer, .durationInfo, .playlistContainer {
+            width: 100%;
+        }
+        .playerSongImgDiv{
+            border-radius: 5px !important;
+            overflow: hidden;
+            width: 100%;
+            height: calc(0.3 * 100vw - 20px);
+            box-shadow: 0px 0px 5px rgb(26, 26, 26);
+        }
+        .playerSongImgDiv img {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .songInfo {
+            display: flex;
+            /* margin-top: calc(100vh * 40 / 666);
+            margin-bottom: calc(100vh * 30 / 666); */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; 
+            font-family: 'Open Sans', sans-serif;
+            text-align: center;
+        }
+        #title {
+            font-size: 1.7em;           
+        }
+        #artist {
+            font-size: 1.3em;
+            color: rgb(140, 140, 140);
+            /* margin-top: 10px; */
+            /* margin-top: calc(100vh * 10 / 666); */
+        }
+        .controlContainer {
+            display: flex;
+            width: 100%;
+        }
+        button:nth-of-type(1){
+            flex-grow: 4;
+            text-align: right;
+            /* padding-right: 20px; */
+            /* padding-right: calc(20 * 100vw / 1280); */
+        }
+        button:nth-of-type(2){
+            flex-grow: 1;
+        }
+        button:nth-of-type(3){
+            flex-grow: 1;
+            text-align: left;
+            /* padding-left: 20px; */
+            /* padding-left: calc(20 * 100vw / 1280); */
+        }
+        button:nth-of-type(4){
+            flex-grow: 2;
+            text-align: right;
+        }
+        .controlContainer i {
+            font-size: 3.5em
+        }
+        #togglePlaylist i {
+            font-size: 2.5em
+        }
+        .durationContainer {
+            width: 100%;
+            /* margin-top: 40px; */
+            /* margin-top: calc(40 * 100vh / 666); */
+        }
+        .durationBar {
+            width: 100%;
+            /* height: 6px; */
+            /* height: calc(6 * 100vh / 666); */
+            border-radius: 5px;
+            background: rgb(217, 217, 217);
+            position: relative;
+        }
+        .durationProgressBar {
+            width: 0%;
+            height: 100%;
+            border-radius: 5px;
+            background:rgb(140, 140, 140);
+        }
+        .progressMark {
+            position: absolute;
+            /* width: 6px;
+            height: 18px; */
+            /* width: calc(6 * 100vw / 1280);
+            height: calc(18 * 100vh / 666); */
+            top: -6px;
+            left: -3px;
+            border-radius: 5px;
+            background: rgb(13, 13, 13);
+            box-shadow: 1px 1px 3px rgb(140, 140, 140);
+            display: none;
+        }
+        .durationBar:hover .progressMark {
+            display: block;
+        }
+        .progressMark:hover, .durationBar:hover {
+            cursor: pointer;
+        }
+        .durationInfo {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            /* margin-top: 5px; */
+            /* margin-top: calc(5 * 100vh / 666); */
+        }
+        .hide {
+            display: none;
+        }
+        .playerPlaylist {
+            /* margin-top: 15px; */
+            /* margin-top: calc(15 * 100vh / 666); */
+            height: 0px;
+            scroll-behavior: smooth;
+            transition: height .3s linear;
+            overflow: scroll;
+            display: none;
+        }
+        .expandPlaylist {
+            scroll-behavior: smooth;
+            transition: height .3s linear;
+            display: block;
+        }
+        .playerSongElement {
+            width: 100%;
+            height: 66px;
+            display: flex;
+            flex-direction: row;
+            opacity: 0.7;
+
+        }
+        .playerSongElement:hover {
+            cursor: pointer;
+        }
+        .playerSongImgContainer {
+            width: 30%;
+            padding: 5px 10px 5px 5px;
+            font-family: 'Open Sans', sans-serif;
+        }
+        .playerSongImgContainer img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: 5px;
+        }
+        .songInfoContainer {
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: space-around;
+            font-family: 'Open Sans', sans-serif;
+            /* padding-right: 5px; */
+        }
+        .playerArtistElement {
+            font-size: .7em;
+        }
+        .playerTitleElement {
+            font-size: 1em;
+        }
+        #stop {
+            border: 1px solid cyan;
+            height: 50px;
+            width: 50px;
+            text-align: center;
+            padding: 2px;
+            position: absolute;
+            background: white;
+            z-index: 100;
+        }
+        .timeElapsed, .duration {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 12px;
+        }
+        #previous i, #next i, #togglePlaylist i {
+            color: rgb(140, 140, 140)
+        }
+        .playlistTextContainer {
+            font-size: 1.3em;
+            font-family: "Open Sans", sans-serif;
+            width: 100%;
+            padding: 8px 5px 10px 5px;
+        }
+        .currentSongPlaying {
+            opacity: 1;
+        }
+        .playerSongImgDiv, .songImgDiv {
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+        .rotateAnimation {
+            animation: rotateAnimation 30s linear infinite;
+        }
+        @keyframes rotateAnimation {
+            0%{
+                transform: rotate(0);
+            } 
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="mainContainer">
+        <button id="stop">Stop</button>
+        <div class="visualizerContainer">
+            <div class="songImgDiv">
+                <img class="songImg" src="img/cover.jpg"/>
+            </div>
+            <audio></audio>
+            <canvas></canvas>
+        </div>
+        <div class="playerContainer">
+            <div class="playerSongImgDiv">
+                <img class="songImg" src="img/cover.jpg"/>
+            </div>
+            <div class="songInfo">
+                <div id="title"><p>Title</p></div>
+                <div id="artist"><p>Artist</p></div> 
+            </div>
+            <div class="controlContainer">
+                <button id="previous"><i class="material-icons">fast_rewind</i></button>
+                <button id="togglePlay"><i class="material-icons" id="togglePlayIcon">play_arrow</i></button>
+                <button id="next"><i class="material-icons">fast_forward</i></button>
+                <button id="togglePlaylist"><i class="material-icons">format_list_bulleted</i></button>
+            </div>
+            <div class="durationContainer">
+                <div class="durationBarContainer">
+                    <div class="durationBar">
+                        <div class="durationProgressBar"></div>
+                        <div class="progressMark"></div>
+                    </div>
+                </div>
+                <div class="durationInfo">
+                    <div class="timeElapsed">--:--</div>
+                    <div class="duration">--:--</div>
+                </div>
+            </div>
+            <div class="playlistContainer hide">
+                <p class="playlistTextContainer">Playlist</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
